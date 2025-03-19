@@ -40,7 +40,7 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           mkdir install
-          podman run --rm -v $(pwd)/install:/install -v $(pwd)/src:/src ${{ matrix.container }} /src/${{ matrix.script }}
+          docker run --rm -v $(pwd)/install:/install -v $(pwd)/src:/src ${{ matrix.container }} /src/${{ matrix.script }}
           
       - name: Run build (macOS)
         if: ${{ matrix.os == 'macos-12' }}
