@@ -13,8 +13,8 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            container: oraclelinux:7
-            script: build-rhel7.sh
+            container: oraclelinux:8
+            script: build-rhel8.sh
             artifact-name: linux-glibc
           - os: ubuntu-latest
             container: alpine:3.21
