@@ -20,7 +20,7 @@ jobs:
             container: alpine:3.21
             script: build-alpine.sh
             artifact-name: linux-musl
-          - os: macos-12
+          - os: macos-13
             artifact-name: macos
           - os: windows-2022
             artifact-name: windows
@@ -43,7 +43,7 @@ jobs:
           podman run --rm -v $(pwd)/install:/install -v $(pwd)/src:/src ${{ matrix.container }} /src/${{ matrix.script }}
           
       - name: Run build (macOS)
-        if: ${{ matrix.os == 'macos-12' }}
+        if: ${{ matrix.os == 'macos-13' }}
         run: |
           mkdir install
           mkdir build
