@@ -12,6 +12,7 @@
 #include <cstdarg>
 #include <cstddef>
 #include <exception>
+#include <new>
 
 static_assert(sizeof(void*) == sizeof(uint64_t), "Only x64 systems are supported");
 
