@@ -17,7 +17,7 @@ jobs:
             script: build-rhel7.sh
             artifact-name: linux-glibc
           - os: ubuntu-latest
-            container: alpine:3.11
+            container: alpine:3.21
             script: build-alpine.sh
             artifact-name: linux-musl
           - os: macos-12
