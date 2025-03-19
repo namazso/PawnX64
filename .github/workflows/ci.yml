@@ -1,0 +1,81 @@
+name: build
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - "*"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            container: oraclelinux:7
+            script: build-rhel7.sh
+            artifact-name: linux-glibc
+          - os: ubuntu-latest
+            container: alpine:3.11
+            script: build-alpine.sh
+            artifact-name: linux-musl
+          - os: macos-12
+            artifact-name: macos
+          - os: windows-2022
+            artifact-name: windows
+        
+    name: build
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          path: src
+          
+      - name: Run build (Linux)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          mkdir install
+          podman run --rm -v $(pwd)/install:/install -v $(pwd)/src:/src ${{ matrix.container }} /src/${{ matrix.script }}
+          
+      - name: Run build (macOS)
+        if: ${{ matrix.os == 'macos-12' }}
+        run: |
+          mkdir install
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../src
+          cmake --build .
+          ctest
+          cmake --install . --prefix $(pwd)/../install
+          
+      - name: Enable Developer Command Prompt (Windows)
+        if: ${{ matrix.os == 'windows-2022' }}
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64
+          
+      - name: Run build (Windows)
+        if: ${{ matrix.os == 'windows-2022' }}
+        env:
+          CC: clang-cl
+          CXX: clang-cl
+        run: |
+          mkdir install
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -G "Ninja" ..\src
+          cmake --build .
+          ctest
+          cmake --install . --prefix ..\install
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: |
+            install
